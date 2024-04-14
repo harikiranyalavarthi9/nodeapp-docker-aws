@@ -1,0 +1,27 @@
+{
+  "name": "nodeapp-docker-aws",
+  "version": "1.0.0",
+  "description": "A sample node app to be deployed docker image into AWS  ",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harikiranyalavarthi9/nodeapp-docker-aws.git"
+  },
+  "type": "module",
+  "author": "Hari Kiran Yalavarthi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/harikiranyalavarthi9/nodeapp-docker-aws/issues"
+  },
+  "homepage": "https://github.com/harikiranyalavarthi9/nodeapp-docker-aws#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.9.4"
+  }
+}
