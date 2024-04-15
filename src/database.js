@@ -12,11 +12,9 @@ export const connectToDatabase = async () => {
             database: process.env.DB_NAME
         });
 
-        console.log(`Connected to database with name: ${process.env.DB_NAME}`);
         return db;
     } catch(error) {
         console.error(`Error connecting to database: ${error}`);
         throw error;
     }
 };
-
