@@ -1,17 +1,26 @@
 import express from 'express';
-import { getHeroes, getHeroById, createHero, updateHeroById, deleteHeroById, deleteHeroes } from '../controllers/heroController.js';
+import {
+    getHeroes,
+    getHeroById,
+    createHero,
+    updateHeroById,
+    deleteHeroById,
+    deleteHeroes
+} from '../controllers/heroController.js';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.status(200).json({ message: 'Valid starting endpoint' });
-});
+// Define routes for CRUD operations on heroes
+router.route('/')
+    .get(getHeroes)     // Retrieve all heroes
+    .post(createHero);  // Create a new hero
 
-router.get('/heroes', getHeroes);
-router.get('/heroes/:id', getHeroById);
-router.post('/heroes', createHero);
-router.put('/heroes/:id', updateHeroById);
-router.delete('/heroes/:id', deleteHeroById);
-router.delete('/heroes', deleteHeroes);
+router.route('/:id')
+    .get(getHeroById)         // Retrieve a specific hero by ID
+    .put(updateHeroById)      // Update a specific hero by ID
+    .delete(deleteHeroById);  // Delete a specific hero by ID
+
+// Define a route to delete all heroes
+router.delete('/', deleteHeroes);
 
 export default router;

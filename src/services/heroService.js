@@ -1,44 +1,88 @@
-import { connectToDatabase } from '../database.js';
+import pool from '../config/db.js';
+import { databaseErrorHandler } from '../middleware/errorHandler.js';
 
+// Get all heroes from the database
 export const getHeroesFromDatabase = async () => {
-    const db = await connectToDatabase();
-    const [result] = await db.execute(`SELECT * from heroes;`);
-    return result;
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM heroes;');
+        client.release(); // Release the client back to the pool
+        return result.rows;
+    } catch (error) {
+        databaseErrorHandler(error);
+        throw new Error('Failed to fetch heroes');
+    }
 }
 
+// Get a hero by ID from the database
 export const getHeroByIdFromDatabase = async (id) => {
-    const db = await connectToDatabase();
-    const [result] = await db.execute(`SELECT * from heroes WHERE id = ?`,[id]);
-    return result;
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM heroes WHERE id = $1', [id]);
+        client.release(); // Release the client back to the pool
+        return result.rows[0]; // Assuming only one hero will match the ID
+    } catch (error) {
+        databaseErrorHandler(error);
+        throw new Error('Failed to fetch hero by ID');
+    }
 }
 
+// Create a hero in the database
 export const createHeroInDatabase = async (insertData) => {
-    const db = await connectToDatabase();
-    const {name, industry, description, image_data} = insertData;
-    const [result] = await db.execute(
-        `INSERT INTO heroes(name, industry, description, image_data) VALUES (?, ?, ?, ?)`,
-        [name, industry, description, image_data])
-    return result;
+    const { name, title, industry_id } = insertData;
+    try {
+        const client = await pool.connect();
+        const result = await client.query(
+            'INSERT INTO heroes(name, title, industry_id) VALUES ($1, $2, $3) RETURNING *',
+            [name, title, industry_id]
+        );
+        client.release(); // Release the client back to the pool
+        return result.rows[0];
+    } catch (error) {
+        databaseErrorHandler(error);
+        throw new Error('Failed to create hero');
+    }
 }
 
+// Update a hero by ID in the database
 export const updateHeroByIdInDatabase = async (id, updateData) => {
-    const db = await connectToDatabase();
-    const { name, industry, description, image_data } = updateData;
-    const [result] = await db.execute(
-        `UPDATE heroes SET name=?, industry=?, description=?, image_data=? WHERE id=?`,
-        [name, industry, description, image_data, id]
-    );
-    return result;
-};
-
-export const deleteHeroByIdFromDatabase = async (id) => {
-    const db = await connectToDatabase();
-    const [result] = await db.execute(`DELETE from heroes WHERE id = ?`,[id]);
-    return result;
+    const { name, title, industry_id } = updateData;
+    try {
+        const client = await pool.connect();
+        const result = await client.query(
+            'UPDATE heroes SET name=$1, title=$2, industry_id=$3 WHERE id=$4 RETURNING *',
+            [name, title, industry_id, id]
+        );
+        client.release(); // Release the client back to the pool
+        return result.rows[0];
+    } catch (error) {
+        databaseErrorHandler(error);
+        throw new Error('Failed to update hero by ID');
+    }
 }
 
-export const deleteHeroesFromDatabase = async (id) => {
-    const db = await connectToDatabase();
-    const [result] = await db.execute(`DELETE from heroes`);
-    return result;
+// Delete a hero by ID from the database
+export const deleteHeroByIdFromDatabase = async (id) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('DELETE FROM heroes WHERE id = $1 RETURNING *', [id]);
+        client.release(); // Release the client back to the pool
+        return result.rows[0];
+    } catch (error) {
+        databaseErrorHandler(error);
+        throw new Error('Failed to delete hero by ID');
+    }
+}
+
+// Delete all heroes from the database
+export const deleteHeroesFromDatabase = async () => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('DELETE FROM heroes RETURNING *');
+        client.release(); // Release the client back to the pool
+        return result.rows;
+    } catch (error) {
+        databaseErrorHandler(error);
+        throw new Error('Failed to delete all heroes');
+    }
 }
